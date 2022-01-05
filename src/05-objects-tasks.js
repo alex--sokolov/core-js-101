@@ -20,8 +20,12 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  return {
+    width,
+    height,
+    getArea: () => width * height,
+  };
 }
 
 
@@ -35,8 +39,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +55,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const res = JSON.parse(json);
+  Object.setPrototypeOf(res, proto);
+  return res;
 }
 
 
@@ -110,36 +116,128 @@ function fromJSON(/* proto, json */) {
  *  For more examples see unit tests.
  */
 
+
+class MySuperBase {
+  constructor() {
+    this.elementSelector = '';
+    this.idSelector = '';
+    this.classSelector = '';
+    this.attrSelector = '';
+    this.pseudoClassSelector = '';
+    this.pseudoElementSelector = '';
+    this.inputString = '';
+    this.isCombiner = false;
+    this.error1 = 'Element, id and pseudo-element should not occur more then one time inside the selector';
+    this.error2 = 'Selector parts should be arranged in the following order: element, id, class, attribute, '
+      + 'pseudo-class, pseudo-element';
+    this.order = 0;
+  }
+
+  element(value) {
+    if (this.elementSelector !== '') {
+      throw new Error(this.error1);
+    }
+    if (this.order > 1) {
+      throw new Error(this.error2);
+    }
+    this.order = 1;
+    this.elementSelector = value;
+    return this;
+  }
+
+  id(value) {
+    if (this.idSelector !== '') {
+      throw new Error(this.error1);
+    }
+    if (this.order > 2) {
+      throw new Error(this.error2);
+    }
+    this.order = 2;
+    this.idSelector = `#${value}`;
+    return this;
+  }
+
+  class(value) {
+    if (this.order > 3) {
+      throw new Error(this.error2);
+    }
+    this.order = 3;
+    this.classSelector += `.${value}`;
+    return this;
+  }
+
+  attr(value) {
+    if (this.order > 4) {
+      throw new Error(this.error2);
+    }
+    this.order = 4;
+    this.attrSelector += `[${value}]`;
+    return this;
+  }
+
+  pseudoClass(value) {
+    if (this.order > 5) {
+      throw new Error(this.error2);
+    }
+    this.order = 5;
+    this.pseudoClassSelector += `:${value}`;
+    return this;
+  }
+
+  pseudoElement(value) {
+    if (this.pseudoElementSelector !== '') {
+      throw new Error(this.error1);
+    }
+    this.order = 6;
+    this.pseudoElementSelector = `::${value}`;
+    return this;
+  }
+
+  stringify() {
+    if (!this.isCombiner) {
+      this.inputString = this.elementSelector + this.idSelector + this.classSelector
+        + this.attrSelector + this.pseudoClassSelector + this.pseudoElementSelector;
+    }
+    return this.inputString.toString();
+  }
+
+  combiner(value) {
+    this.inputString = `${value}`;
+    this.isCombiner = true;
+    return this;
+  }
+}
+
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return new MySuperBase().element(value);
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new MySuperBase().id(value);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new MySuperBase().class(value);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new MySuperBase().attr(value);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new MySuperBase().pseudoClass(value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new MySuperBase().pseudoElement(value);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const combinatorSp = ` ${combinator} `;
+    return new MySuperBase().combiner(selector1.stringify() + combinatorSp + selector2.stringify());
   },
 };
-
 
 module.exports = {
   Rectangle,

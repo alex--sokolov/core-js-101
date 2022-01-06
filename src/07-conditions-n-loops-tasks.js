@@ -168,11 +168,13 @@ function doRectanglesOverlap(rect1, rect2) {
  *   { center: { x:0, y:0 }, radius:10 },  { x:0, y:0 }     => true
  *   { center: { x:0, y:0 }, radius:10 },  { x:10, y:10 }   => false
  *
+ *
  */
-function isInsideCircle(/* circle, point */) {
-  throw new Error('Not implemented');
-}
 
+function isInsideCircle(circle, point) {
+  const dist = Math.sqrt((point.x - circle.center.x) ** 2 + (point.y - circle.center.y) ** 2);
+  return dist < circle.radius;
+}
 
 /**
  * Returns the first non repeated char in the specified strings otherwise returns null.
@@ -185,10 +187,17 @@ function isInsideCircle(/* circle, point */) {
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-function findFirstSingleChar(/* str */) {
-  throw new Error('Not implemented');
+function findFirstSingleChar(str) {
+  const arr = [];
+  for (let i = 0; i < str.length - 1; i += 1) {
+    const newStr = str.slice(i + 1, str.length);
+    if (!newStr.includes(str[i]) && !arr.includes(str[i])) {
+      return str[i];
+    }
+    arr.push(str[i]);
+  }
+  return null;
 }
-
 
 /**
  * Returns the string representation of math interval,
@@ -212,8 +221,11 @@ function findFirstSingleChar(/* str */) {
  *   5, 3, true, true   => '[3, 5]'
  *
  */
-function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
-  throw new Error('Not implemented');
+function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+  let str = isStartIncluded ? '[' : '(';
+  str += a <= b ? `${a}, ${b}` : `${b}, ${a}`;
+  str += isEndIncluded ? ']' : ')';
+  return str;
 }
 
 
@@ -229,10 +241,9 @@ function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
  * 'rotator' => 'rotator'
  * 'noon' => 'noon'
  */
-function reverseString(/* str */) {
-  throw new Error('Not implemented');
+function reverseString(str) {
+  return str.split('').reverse().join('');
 }
-
 
 /**
  * Reverse the specified integer number (put all digits in reverse order)
@@ -246,10 +257,9 @@ function reverseString(/* str */) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  return +num.toString().split('').reverse().join('');
 }
-
 
 /**
  * Validates the CCN (credit card number) and return true if CCN is valid
@@ -271,8 +281,21 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  let sum = 0;
+  let j = 1;
+  const str = ccn.toString();
+  const num = str.length - 1;
+  for (let i = num - 1; i >= 0; i -= 1) {
+    if (j % 2 === 0) sum += +str[i];
+    else {
+      const temp = (str[i] * 2).toString();
+      sum += temp >= 10 ? +temp[0] + +temp[1] : +temp;
+    }
+    j += 1;
+  }
+  if (sum % 10 === 0) return sum % 10 === +str[num];
+  return 10 - (sum % 10) === +str[num];
 }
 
 /**
@@ -289,9 +312,16 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  const arr = num.toString().split('').map(Number);
+  let sum = 0;
+  arr.reduce((acc, cur) => {
+    sum += cur;
+    return sum;
+  }, 0);
+  return sum > 10 ? +sum.toString()[0] + +sum.toString()[1] : sum;
 }
+getDigitalRoot(12345);
 
 
 /**
@@ -315,8 +345,21 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  const arr = str.split('');
+  const brackets = {
+    '{': '}',
+    '[': ']',
+    '(': ')',
+    '<': '>',
+  };
+  const temp = [];
+  for (let i = 0; i < arr.length; i += 1) {
+    if (Object.keys(brackets).includes(arr[i])) temp.push(arr[i]);
+    else if (arr[i] === brackets[temp[temp.length - 1]]) temp.pop();
+    else return false;
+  }
+  return temp.length === 0;
 }
 
 

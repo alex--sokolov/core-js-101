@@ -383,10 +383,9 @@ function isBracketsBalanced(str) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  return num.toString(n);
 }
-
 
 /**
  * Returns the common directory path for specified array of full filenames.
@@ -400,10 +399,15 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  const unique = pathes[0].split('');
+  pathes.forEach((path) => {
+    path.split('').forEach((sym, index) => {
+      if (unique[index] !== sym) unique.splice(index, unique.length);
+    });
+  });
+  return unique.splice(unique.reverse().indexOf('/')).reverse().join('');
 }
-
 
 /**
  * Returns the product of two specified matrixes.
@@ -423,10 +427,29 @@ function getCommonDirectoryPath(/* pathes */) {
  *                         [ 6 ]]
  *
  */
-function getMatrixProduct(/* m1, m2 */) {
-  throw new Error('Not implemented');
-}
+function getMatrixProduct(m1, m2) {
+  const m3 = new Array(m1.length).fill(0);
+  m3.forEach((el, index) => {
+    m3[index] = new Array(m2[0].length).fill(0);
+  });
 
+  for (let i = 0; i < m1.length; i += 1) {
+    for (let j = 0; j < m2[0].length; j += 1) {
+      let m3El = 0;
+      m1.forEach((m1Row, m1RowIndex) => {
+        m1Row.forEach((m1El, index) => {
+          m3El += m1El * m2[index][j];
+          return m3El;
+        });
+        m3[m1RowIndex][j] = m3El;
+        m3El = 0;
+        if (m1RowIndex + 1 === m1.length && j + 1 === m2[0].length) return m3;
+        return m3El;
+      });
+    }
+  }
+  return m3;
+}
 
 /**
  * Returns the evaluation of the specified tic-tac-toe position.
@@ -458,8 +481,21 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const val = ['0', 'X'];
+  for (let i = 0; i < val.length; i += 1) {
+    if ((val[i] === position[0][0] && val[i] === position[0][1] && val[i] === position[0][2])
+     || (val[i] === position[1][0] && val[i] === position[1][1] && val[i] === position[1][2])
+     || (val[i] === position[2][0] && val[i] === position[2][1] && val[i] === position[2][2])
+     || (val[i] === position[0][0] && val[i] === position[1][0] && val[i] === position[2][0])
+     || (val[i] === position[0][1] && val[i] === position[1][1] && val[i] === position[2][1])
+     || (val[i] === position[0][2] && val[i] === position[1][2] && val[i] === position[2][2])
+     || (val[i] === position[0][0] && val[i] === position[1][1] && val[i] === position[2][2])
+     || (val[i] === position[2][0] && val[i] === position[1][1] && val[i] === position[0][2])) {
+      return val[i];
+    }
+  }
+  return undefined;
 }
 
 
